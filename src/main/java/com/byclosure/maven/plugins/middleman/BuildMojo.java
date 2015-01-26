@@ -9,7 +9,7 @@ import java.io.IOException;
 
 /**
  * @goal build
- * @phase compile
+ * @phase generate-resources
  * @requiresProject true
  */
 public class BuildMojo extends AbstractMiddlemanMojo {

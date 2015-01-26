@@ -10,6 +10,7 @@ import java.io.IOException;
 /**
  * @goal server
  * @requiresProject true
+ * @execute phase=prepare-package
  */
 public class ServerMojo extends AbstractMiddlemanMojo {
 
