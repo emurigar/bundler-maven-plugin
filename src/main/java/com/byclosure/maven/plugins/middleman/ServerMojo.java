@@ -13,10 +13,25 @@ import java.io.IOException;
  */
 public class ServerMojo extends AbstractMiddlemanMojo {
 
+    /** @parameter default-value="false" expression="${middleman.force_polling}" */
+    protected boolean forcePolling;
+
+    /** @parameter default-value="0.25" expression="${middleman.latency}" */
+    protected float latency;
+
     @Override
     public void executeMiddleman() throws MojoExecutionException, ScriptException, IOException, GemException {
         final Script script = factory.newScriptFromSearchPath("middleman");
         script.addArg("server");
+
+        if (forcePolling) {
+            script.addArg("--force-polling");
+        }
+
+        if (latency != 0.25) {
+            script.addArg("--latency=" + latency);
+        }
+
         script.executeIn(launchDirectory());
     }
 
