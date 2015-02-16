@@ -10,6 +10,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +76,7 @@ public abstract class AbstractMiddlemanMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException {
 
 		installBundler();
-		doBundlerInstall();
+		doBundleInstall();
 
 		executeMiddleman();
 	}
@@ -95,10 +96,10 @@ public abstract class AbstractMiddlemanMojo extends AbstractMojo {
 		);
 	}
 
-	protected void doBundlerInstall() throws MojoExecutionException {
+	protected void doBundleInstall() throws MojoExecutionException {
 		final List<Element> argList = getJRubyCompleteArguments();
 
-		argList.add(element(name("argument"), "bundler"));
+		argList.add(element(name("argument"), "bundle"));
 		argList.add(element(name("argument"), "install"));
 
 		executeMojo(
@@ -141,8 +142,14 @@ public abstract class AbstractMiddlemanMojo extends AbstractMojo {
 	}
 
 	protected List<Element> getJRubyCompleteArguments() {
-		final String replacedJrubyCompletePath =
-				jrubyCompletePath.replaceFirst("^~", System.getProperty("user.home"));
+		final String replacedJrubyCompletePath;
+
+		if (jrubyCompletePath.contains("~")) {
+			final File file = new File(System.getProperty("user.home"));
+			replacedJrubyCompletePath = new File(file, jrubyCompletePath.replace("~", "")).getPath();
+		} else {
+			replacedJrubyCompletePath = jrubyCompletePath;
+		}
 
 		final List<Element> argList = new ArrayList<Element>();
 		argList.add(element(name("argument"), Xmx));
