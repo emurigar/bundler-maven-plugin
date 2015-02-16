@@ -1,11 +1,11 @@
 package com.byclosure.maven.plugins.middleman;
 
-import de.saumya.mojo.ruby.gems.GemException;
-import de.saumya.mojo.ruby.script.Script;
-import de.saumya.mojo.ruby.script.ScriptException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.twdata.maven.mojoexecutor.MojoExecutor;
 
-import java.io.IOException;
+import java.util.List;
+
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 /**
  * @goal build
@@ -13,10 +13,18 @@ import java.io.IOException;
  * @requiresProject true
  */
 public class BuildMojo extends AbstractMiddlemanMojo {
-    @Override
-    public void executeMiddleman() throws MojoExecutionException, ScriptException, IOException, GemException {
-        final Script script = factory.newScriptFromSearchPath("middleman");
-        script.addArg("build");
-        script.executeIn(launchDirectory());
-    }
+	@Override
+	public void executeMiddleman() throws MojoExecutionException {
+		final List<MojoExecutor.Element> argList = getJRubyCompleteArguments();
+		argList.add(element(name("argument"), "bundle"));
+		argList.add(element(name("argument"), "exec"));
+		argList.add(element(name("argument"), "middleman build -e " + mmEnv));
+
+		executeMojo(
+				getExecMavenPlugin(),
+				goal("exec"),
+				getConfiguration(argList),
+				getEnv()
+		);
+	}
 }

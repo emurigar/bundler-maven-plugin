@@ -1,11 +1,12 @@
 package com.byclosure.maven.plugins.middleman;
 
-import de.saumya.mojo.ruby.gems.GemException;
-import de.saumya.mojo.ruby.script.Script;
-import de.saumya.mojo.ruby.script.ScriptException;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import java.io.IOException;
+import java.util.List;
+
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
 /**
  * @goal server
@@ -13,26 +14,39 @@ import java.io.IOException;
  */
 public class ServerMojo extends AbstractMiddlemanMojo {
 
-    /** @parameter default-value="false" expression="${middleman.force_polling}" */
-    protected boolean forcePolling;
+	/**
+	 * @parameter default-value="false" expression="${middleman.force_polling}"
+	 */
+	protected boolean forcePolling;
 
-    /** @parameter default-value="0.25" expression="${middleman.latency}" */
-    protected float latency;
+	/**
+	 * @parameter default-value="0.25" expression="${middleman.latency}"
+	 */
+	protected float latency;
 
-    @Override
-    public void executeMiddleman() throws MojoExecutionException, ScriptException, IOException, GemException {
-        final Script script = factory.newScriptFromSearchPath("middleman");
-        script.addArg("server");
 
-        if (forcePolling) {
-            script.addArg("--force-polling");
-        }
+	@Override
+	public void executeMiddleman() throws MojoExecutionException {
+		final List<Element> argList = getJRubyCompleteArguments();
 
-        if (latency != 0.25) {
-            script.addArg("--latency=" + latency);
-        }
+		argList.add(element(name("argument"), "bundle"));
+		argList.add(element(name("argument"), "exec"));
+		argList.add(element(name("argument"), "middleman server -e " + mmEnv));
 
-        script.executeIn(launchDirectory());
-    }
+		if (forcePolling) {
+			argList.add(element(name("argument"), "--force-polling"));
+		}
+
+		if (latency != 0.25) {
+			argList.add(element(name("argument"), "--latency=" + latency));
+		}
+
+		executeMojo(
+				getExecMavenPlugin(),
+				goal("exec"),
+				getConfiguration(argList),
+				getEnv()
+		);
+	}
 
 }

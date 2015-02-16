@@ -1,30 +1,35 @@
 package com.byclosure.maven.plugins.middleman;
 
-import de.saumya.mojo.gem.AbstractGemMojo;
-import de.saumya.mojo.ruby.gems.GemException;
-import de.saumya.mojo.ruby.script.Script;
-import de.saumya.mojo.ruby.script.ScriptException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.twdata.maven.mojoexecutor.MojoExecutor;
 
-import java.io.IOException;
+import java.util.List;
+
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 /**
  * @goal gems-update
  * @requiresProject true
  */
-public class GemsUpdateMojo extends AbstractGemMojo {
+public class GemsUpdateMojo extends AbstractMiddlemanMojo {
 
-    /** @parameter default-value="${project.basedir}/src/main/webapp/Gemfile" expression="${middleman.bundle_file}" */
-    protected String bundleFileLocation;
+	@Override
+	public void execute() throws MojoExecutionException {
+		installBundler();
 
-    @Override
-    public void executeWithGems() throws MojoExecutionException,
-            ScriptException, IOException, GemException {
+		final List<MojoExecutor.Element> argList = getJRubyCompleteArguments();
+		argList.add(element(name("argument"), "bundle"));
+		argList.add(element(name("argument"), "update"));
 
-        this.factory.addEnv("BUNDLE_GEMFILE", bundleFileLocation);
+		executeMojo(
+				getExecMavenPlugin(),
+				goal("exec"),
+				getConfiguration(argList),
+				getEnv()
+		);
+	}
 
-        final Script buScript = factory.newScriptFromSearchPath("bundle");
-        buScript.addArgs("update");
-        buScript.executeIn(launchDirectory());
-    }
+	@Override
+	public void executeMiddleman() throws MojoExecutionException {
+	}
 }
