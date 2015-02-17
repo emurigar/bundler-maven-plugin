@@ -66,9 +66,9 @@ public abstract class AbstractMiddlemanMojo extends AbstractMojo {
 	protected String mmEnv;
 
 	/**
-	 * @parameter default-value="-Xmx500m" expression="${middleman.Xmx}"
+	 * @parameter default-value="-Xmx500m" expression="${middleman.java_max_heap}"
 	 */
-	protected String Xmx;
+	protected String javaMaxHeap;
 
 	public abstract void executeMiddleman() throws MojoExecutionException;
 
@@ -152,7 +152,7 @@ public abstract class AbstractMiddlemanMojo extends AbstractMojo {
 		}
 
 		final List<Element> argList = new ArrayList<Element>();
-		argList.add(element(name("argument"), Xmx));
+		argList.add(element(name("argument"), javaMaxHeap));
 		argList.add(element(name("argument"), "-Xss1024k"));
 		argList.add(element(name("argument"), "-jar"));
 		argList.add(element(name("argument"), replacedJrubyCompletePath));
