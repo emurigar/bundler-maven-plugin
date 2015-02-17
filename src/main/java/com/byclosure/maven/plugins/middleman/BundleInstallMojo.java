@@ -4,20 +4,15 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
- * @goal build
- * @phase generate-resources
- * @requiresProject true
+ * @goal bundle-install
+ * @requiresProject false
  */
-public class BuildMojo extends AbstractMiddlemanMojo {
+public class BundleInstallMojo extends AbstractMiddlemanMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException {
 		CommandLine cmdLine = getCrossPlatformCommandLine("bundle");
-
-		cmdLine.addArgument("exec");
-		cmdLine.addArgument("middleman");
-		cmdLine.addArgument("build");
-
+		cmdLine.addArgument("update");
 		executeCommandLine(cmdLine);
 	}
 

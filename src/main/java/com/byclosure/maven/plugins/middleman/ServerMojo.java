@@ -19,25 +19,23 @@ public class ServerMojo extends AbstractMiddlemanMojo {
 	 */
 	protected float latency;
 
-
 	@Override
-	public void executeMiddleman() throws MojoExecutionException {
-		CommandLine cmdLine = new CommandLine("bundle");
+	public void execute() throws MojoExecutionException {
+		final CommandLine cmdLine = getCrossPlatformCommandLine("bundle");
 		cmdLine.addArgument("exec");
 		cmdLine.addArgument("middleman");
 		cmdLine.addArgument("server");
-		cmdLine.addArgument("-e");
-		cmdLine.addArgument(mmEnv);
 
 		if (forcePolling) {
 			cmdLine.addArgument("--force-polling");
 		}
 
 		if (latency != 0.25) {
-			cmdLine.addArgument(" --latency=" + latency);
+			cmdLine.addArgument("--latency=" + latency);
 		}
 
-		executeProcess(cmdLine);
+		executeCommandLine(cmdLine);
 	}
+
 
 }

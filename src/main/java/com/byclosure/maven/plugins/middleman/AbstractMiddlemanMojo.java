@@ -8,6 +8,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class AbstractMiddlemanMojo extends AbstractMojo {
 
@@ -22,30 +24,36 @@ public abstract class AbstractMiddlemanMojo extends AbstractMojo {
 	protected String mmEnv;
 
 
-	public abstract void executeMiddleman() throws MojoExecutionException;
-
-	@Override
-	public void execute() throws MojoExecutionException {
-		doBundleInstall();
-		executeMiddleman();
+	protected boolean isWindows() {
+		return System.getProperty("os.name").startsWith("Windows");
 	}
 
-	protected void doBundleInstall() throws MojoExecutionException {
-		CommandLine cmdLine = new CommandLine("bundle");
-		cmdLine.addArgument("update");
+	protected CommandLine getCrossPlatformCommandLine(String executable) {
+		final CommandLine cmdLine;
 
-		executeProcess(cmdLine);
+		if (isWindows()) {
+			cmdLine = new CommandLine("cmd");
+			cmdLine.addArgument("/c");
+			cmdLine.addArgument(executable);
+		} else {
+			cmdLine = new CommandLine(executable);
+		}
+
+		return cmdLine;
 	}
 
-	protected void executeProcess(CommandLine cmdLine) throws MojoExecutionException {
+	protected void executeCommandLine(CommandLine cmdLine) throws MojoExecutionException {
 		DefaultExecutor executor = new DefaultExecutor();
 		executor.setWorkingDirectory(new File(mmRoot));
 
 		PumpStreamHandler pump = new PumpStreamHandler(System.out, System.err, System.in);
 		executor.setStreamHandler(pump);
 
+		final Map<String, String> env = new HashMap<String, String>(System.getenv());
+		env.put("MM_ENV", mmEnv);
+
 		try {
-			executor.execute(cmdLine, System.getenv());
+			executor.execute(cmdLine, env);
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage());
 		}

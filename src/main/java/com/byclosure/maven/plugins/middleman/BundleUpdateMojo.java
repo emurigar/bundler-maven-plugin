@@ -4,20 +4,17 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
- * @goal gems-update
- * @requiresProject true
+ * @goal bundle-update
+ * @requiresProject false
  */
-public class GemsUpdateMojo extends AbstractMiddlemanMojo {
+public class BundleUpdateMojo extends AbstractMiddlemanMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException {
-		CommandLine cmdLine = new CommandLine("bundle");
+		CommandLine cmdLine = getCrossPlatformCommandLine("bundle");
 		cmdLine.addArgument("update");
 
-		executeProcess(cmdLine);
+		executeCommandLine(cmdLine);
 	}
 
-	@Override
-	public void executeMiddleman() throws MojoExecutionException {
-	}
 }
