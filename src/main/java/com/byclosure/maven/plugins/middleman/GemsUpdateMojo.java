@@ -15,16 +15,13 @@ public class GemsUpdateMojo extends AbstractMiddlemanMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException {
-		installBundler();
-
-		final List<MojoExecutor.Element> argList = getJRubyCompleteArguments();
-		argList.add(element(name("argument"), "bundle"));
+		final List<MojoExecutor.Element> argList = getEmptyArguments();
 		argList.add(element(name("argument"), "update"));
 
 		executeMojo(
 				getExecMavenPlugin(),
 				goal("exec"),
-				getConfiguration(argList),
+				getBundleConfiguration(argList),
 				getEnv()
 		);
 	}

@@ -5,8 +5,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import java.util.List;
 
 import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
 
 /**
  * @goal server
@@ -27,9 +25,8 @@ public class ServerMojo extends AbstractMiddlemanMojo {
 
 	@Override
 	public void executeMiddleman() throws MojoExecutionException {
-		final List<Element> argList = getJRubyCompleteArguments();
+		final List<Element> argList = getEmptyArguments();
 
-		argList.add(element(name("argument"), "bundle"));
 		argList.add(element(name("argument"), "exec"));
 		argList.add(element(name("argument"), "middleman server -e " + mmEnv));
 
@@ -44,7 +41,7 @@ public class ServerMojo extends AbstractMiddlemanMojo {
 		executeMojo(
 				getExecMavenPlugin(),
 				goal("exec"),
-				getConfiguration(argList),
+				getBundleConfiguration(argList),
 				getEnv()
 		);
 	}

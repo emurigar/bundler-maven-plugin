@@ -10,7 +10,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,11 +37,6 @@ public abstract class AbstractMiddlemanMojo extends AbstractMojo {
 	protected BuildPluginManager pluginManager;
 
 	/**
-	 * @parameter default-value="~/.m2/repository/org/jruby/jruby-complete/1.7.4/jruby-complete-1.7.4.jar" expression="${middleman.jruby_complete_path}"
-	 */
-	protected String jrubyCompletePath;
-
-	/**
 	 * @parameter expression="${middleman.gem_home}"
 	 * default-value="${project.build.directory}/rubygems"
 	 */
@@ -65,47 +59,25 @@ public abstract class AbstractMiddlemanMojo extends AbstractMojo {
 	 */
 	protected String mmEnv;
 
-	/**
-	 * @parameter default-value="-Xmx500m" expression="${middleman.java_max_heap}"
-	 */
-	protected String javaMaxHeap;
 
 	public abstract void executeMiddleman() throws MojoExecutionException;
 
 	@Override
 	public void execute() throws MojoExecutionException {
-
-		installBundler();
 		doBundleInstall();
 
 		executeMiddleman();
 	}
 
-	protected void installBundler() throws MojoExecutionException {
-		final List<Element> argList = getJRubyCompleteArguments();
-
-		argList.add(element(name("argument"), "gem"));
-		argList.add(element(name("argument"), "install"));
-		argList.add(element(name("argument"), "bundler"));
-
-		executeMojo(
-				getExecMavenPlugin(),
-				goal("exec"),
-				getConfiguration(argList),
-				getEnv()
-		);
-	}
-
 	protected void doBundleInstall() throws MojoExecutionException {
-		final List<Element> argList = getJRubyCompleteArguments();
+		final List<Element> argList = getEmptyArguments();
 
-		argList.add(element(name("argument"), "bundle"));
 		argList.add(element(name("argument"), "install"));
 
 		executeMojo(
 				getExecMavenPlugin(),
 				goal("exec"),
-				getConfiguration(argList),
+				getBundleConfiguration(argList),
 				getEnv()
 		);
 	}
@@ -127,37 +99,22 @@ public abstract class AbstractMiddlemanMojo extends AbstractMojo {
 		);
 	}
 
-	protected Xpp3Dom getConfiguration(List<Element> argList) {
+	protected Xpp3Dom getBundleConfiguration(List<Element> argList) {
 		MojoExecutor.Element[] argArr = new MojoExecutor.Element[argList.size()];
 		argArr = argList.toArray(argArr);
 
 		return configuration(
-				element(name("environmentVariables"),
-						element(name("GEM_HOME"), gemHome.getPath()),
-						element(name("GEM_PATH"), gemPath.getPath())),
-				element(name("executable"), "java"),
+				//element(name("environmentVariables"),
+				//		element(name("GEM_HOME"), gemHome.getPath()),
+				//		element(name("GEM_PATH"), gemPath.getPath())),
+				element(name("executable"), "bundle"),
 				element(name("workingDirectory"), mmRoot),
 				element(name("arguments"), argArr)
 		);
 	}
 
-	protected List<Element> getJRubyCompleteArguments() {
-		final String replacedJrubyCompletePath;
-
-		if (jrubyCompletePath.contains("~")) {
-			final File file = new File(System.getProperty("user.home"));
-			replacedJrubyCompletePath = new File(file, jrubyCompletePath.replace("~", "")).getPath();
-		} else {
-			replacedJrubyCompletePath = jrubyCompletePath;
-		}
-
+	protected List<Element> getEmptyArguments() {
 		final List<Element> argList = new ArrayList<Element>();
-		argList.add(element(name("argument"), javaMaxHeap));
-		argList.add(element(name("argument"), "-Xss1024k"));
-		argList.add(element(name("argument"), "-jar"));
-		argList.add(element(name("argument"), replacedJrubyCompletePath));
-		argList.add(element(name("argument"), "-S"));
-
 		return argList;
 	}
 

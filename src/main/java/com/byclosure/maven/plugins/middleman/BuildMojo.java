@@ -15,15 +15,15 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 public class BuildMojo extends AbstractMiddlemanMojo {
 	@Override
 	public void executeMiddleman() throws MojoExecutionException {
-		final List<MojoExecutor.Element> argList = getJRubyCompleteArguments();
-		argList.add(element(name("argument"), "bundle"));
+		final List<MojoExecutor.Element> argList = getEmptyArguments();
+
 		argList.add(element(name("argument"), "exec"));
 		argList.add(element(name("argument"), "middleman build -e " + mmEnv));
 
 		executeMojo(
 				getExecMavenPlugin(),
 				goal("exec"),
-				getConfiguration(argList),
+				getBundleConfiguration(argList),
 				getEnv()
 		);
 	}

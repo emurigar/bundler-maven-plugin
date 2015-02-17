@@ -10,7 +10,6 @@ public class GemsInstallMojo extends AbstractMiddlemanMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException {
-		installBundler();
 		doBundleInstall();
 	}
 
