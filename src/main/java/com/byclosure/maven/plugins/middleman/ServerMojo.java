@@ -1,10 +1,7 @@
 package com.byclosure.maven.plugins.middleman;
 
+import org.apache.commons.exec.CommandLine;
 import org.apache.maven.plugin.MojoExecutionException;
-
-import java.util.List;
-
-import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 /**
  * @goal server
@@ -25,25 +22,22 @@ public class ServerMojo extends AbstractMiddlemanMojo {
 
 	@Override
 	public void executeMiddleman() throws MojoExecutionException {
-		final List<Element> argList = getEmptyArguments();
-
-		argList.add(element(name("argument"), "exec"));
-		argList.add(element(name("argument"), "middleman server -e " + mmEnv));
+		CommandLine cmdLine = new CommandLine("bundle");
+		cmdLine.addArgument("exec");
+		cmdLine.addArgument("middleman");
+		cmdLine.addArgument("server");
+		cmdLine.addArgument("-e");
+		cmdLine.addArgument(mmEnv);
 
 		if (forcePolling) {
-			argList.add(element(name("argument"), "--force-polling"));
+			cmdLine.addArgument("--force-polling");
 		}
 
 		if (latency != 0.25) {
-			argList.add(element(name("argument"), "--latency=" + latency));
+			cmdLine.addArgument(" --latency=" + latency);
 		}
 
-		executeMojo(
-				getExecMavenPlugin(),
-				goal("exec"),
-				getBundleConfiguration(argList),
-				getEnv()
-		);
+		executeProcess(cmdLine);
 	}
 
 }

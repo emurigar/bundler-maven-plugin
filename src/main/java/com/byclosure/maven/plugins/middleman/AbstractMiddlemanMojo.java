@@ -1,53 +1,15 @@
 package com.byclosure.maven.plugins.middleman;
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
+import java.io.IOException;
 
 public abstract class AbstractMiddlemanMojo extends AbstractMojo {
-	/**
-	 * @parameter expression="${project}"
-	 * @required
-	 * @readonly
-	 */
-	protected MavenProject mavenProject;
-
-	/**
-	 * @parameter expression="${session}"
-	 * @required
-	 * @readonly
-	 */
-	protected MavenSession mavenSession;
-
-	/**
-	 * @component
-	 * @required
-	 */
-	protected BuildPluginManager pluginManager;
-
-	/**
-	 * @parameter expression="${middleman.gem_home}"
-	 * default-value="${project.build.directory}/rubygems"
-	 */
-	protected File gemHome;
-
-	/**
-	 * @parameter expression="${middleman.gem_path}"
-	 * default-value="${project.build.directory}/rubygems"
-	 */
-	protected File gemPath;
-
 
 	/**
 	 * @parameter default-value="${project.basedir}/src/main/webapp/" expression="${middleman.root}"
@@ -65,57 +27,28 @@ public abstract class AbstractMiddlemanMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException {
 		doBundleInstall();
-
 		executeMiddleman();
 	}
 
 	protected void doBundleInstall() throws MojoExecutionException {
-		final List<Element> argList = getEmptyArguments();
+		CommandLine cmdLine = new CommandLine("bundle");
+		cmdLine.addArgument("update");
 
-		argList.add(element(name("argument"), "install"));
-
-		executeMojo(
-				getExecMavenPlugin(),
-				goal("exec"),
-				getBundleConfiguration(argList),
-				getEnv()
-		);
+		executeProcess(cmdLine);
 	}
 
+	protected void executeProcess(CommandLine cmdLine) throws MojoExecutionException {
+		DefaultExecutor executor = new DefaultExecutor();
+		executor.setWorkingDirectory(new File(mmRoot));
 
-	protected ExecutionEnvironment getEnv() {
-		return executionEnvironment(
-				mavenProject,
-				mavenSession,
-				pluginManager
-		);
-	}
+		PumpStreamHandler pump = new PumpStreamHandler(System.out, System.err, System.in);
+		executor.setStreamHandler(pump);
 
-	protected Plugin getExecMavenPlugin() {
-		return plugin(
-				groupId("org.codehaus.mojo"),
-				artifactId("exec-maven-plugin"),
-				version("1.3.2")
-		);
-	}
-
-	protected Xpp3Dom getBundleConfiguration(List<Element> argList) {
-		MojoExecutor.Element[] argArr = new MojoExecutor.Element[argList.size()];
-		argArr = argList.toArray(argArr);
-
-		return configuration(
-				//element(name("environmentVariables"),
-				//		element(name("GEM_HOME"), gemHome.getPath()),
-				//		element(name("GEM_PATH"), gemPath.getPath())),
-				element(name("executable"), "bundle"),
-				element(name("workingDirectory"), mmRoot),
-				element(name("arguments"), argArr)
-		);
-	}
-
-	protected List<Element> getEmptyArguments() {
-		final List<Element> argList = new ArrayList<Element>();
-		return argList;
+		try {
+			executor.execute(cmdLine, System.getenv());
+		} catch (IOException e) {
+			throw new MojoExecutionException(e.getMessage());
+		}
 	}
 
 }
