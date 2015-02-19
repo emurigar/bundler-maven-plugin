@@ -8,32 +8,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @goal install
+ * @goal exec
  * @requiresProject true
  */
-public class BundleInstallMojo extends AbstractJRubyMojo {
+public class BundleExecMojo extends AbstractJRubyMojo {
 
 	/**
-	 * @parameter default-value="Gemfile" expression="${bundler.gemfile}"
+	 * @parameter default-value="" expression="${bundler.exec_args}"
 	 */
-	protected String gemfile;
+	protected String execArgs;
 
 	@Override
 	protected void executeComand() throws IOException {
-		final File jrubyFile = new File(jruby_bin, "jruby");
-
 		final Map<String, String> env = new HashMap<String, String>(System.getenv());
 		env.put("GEM_HOME", gem_home);
 		env.put("GEM_PATH", gem_path);
 
 		final CommandLine cmd = getCrossPlatformCommandLine(
 				new File(gem_home, new File("bin", "bundle").getPath()).getPath());
-		cmd.addArgument("install");
-		cmd.addArgument("--binstubs=" + binstubs);
-		cmd.addArgument("--shebang=" + jrubyFile.getPath());
-		cmd.addArgument("--gemfile=" + gemfile);
+		cmd.addArgument("exec");
 
-
+		if (execArgs != null) {
+			cmd.addArguments(execArgs.split(" "));
+		}
 
 		executeCommandLine(cmd, env, project.getBasedir());
 	}
