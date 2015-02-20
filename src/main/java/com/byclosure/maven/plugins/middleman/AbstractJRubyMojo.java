@@ -20,11 +20,9 @@ import java.util.Map;
 public abstract class AbstractJRubyMojo extends AbstractMojo {
 
 	/**
-	 * @parameter expression="${project}"
-	 * @required
-	 * @readOnly
+	 * @parameter default-value="${project.basedir}" expression="${bundler.working_dir}"
 	 */
-	protected MavenProject project;
+	protected String working_dir;
 
 	/**
 	 * @parameter default-value="https://s3.amazonaws.com/jruby.org/downloads/1.7.19/jruby-bin-1.7.19.tar.gz" expression="${bundler.jruby_download_location}"
@@ -123,7 +121,7 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 		cmd.addArgument("--no-rdoc");
 		cmd.addArgument("--no-ri");
 
-		executeCommandLine(cmd, env, project.getBasedir());
+		executeCommandLine(cmd, env, new File(working_dir));
 	}
 
 

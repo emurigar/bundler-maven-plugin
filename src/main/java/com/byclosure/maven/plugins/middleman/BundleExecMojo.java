@@ -41,6 +41,6 @@ public class BundleExecMojo extends AbstractJRubyMojo {
 			}
 		}
 
-		executeCommandLine(cmd, env, project.getBasedir());
+		executeCommandLine(cmd, env, new File(working_dir));
 	}
 }

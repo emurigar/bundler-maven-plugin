@@ -34,6 +34,6 @@ public class BundleInstallMojo extends AbstractJRubyMojo {
 		cmd.addArgument("--shebang=" + jrubyFile.getPath());
 		cmd.addArgument("--gemfile=" + gemfile);
 
-		executeCommandLine(cmd, env, project.getBasedir());
+		executeCommandLine(cmd, env, new File(working_dir));
 	}
 }
