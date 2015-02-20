@@ -3,8 +3,15 @@ package com.byclosure.maven.plugins.middleman;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Decompressor {
 	final static int BUFFER = 2048;
@@ -48,6 +55,8 @@ public class Decompressor {
 					dest.write(data, 0, count);
 				}
 				dest.close();
+
+				applyPermissions(entry.getMode(), file);
 			}
 		}
 
@@ -55,5 +64,54 @@ public class Decompressor {
 
 		tarIn.close();
 		System.out.println("untar completed successfully!!");
+	}
+
+	private static void applyPermissions(int mode, File file) throws IOException {
+		final Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+
+		String octal = Integer.toOctalString(mode);
+		octal = octal.substring(octal.length() -3);
+
+		String binary = Integer.toBinaryString(Integer.parseInt(octal.substring(0, 1)));
+		binary += Integer.toBinaryString(Integer.parseInt(octal.substring(1, 2)));
+		binary += Integer.toBinaryString(Integer.parseInt(octal.substring(2, 3)));
+
+		if (binary.charAt(0) == '1') {
+			perms.add(PosixFilePermission.OWNER_READ);
+		}
+
+		if (binary.charAt(1) == '1') {
+			perms.add(PosixFilePermission.OWNER_WRITE);
+		}
+
+		if (binary.charAt(2) == '1') {
+			perms.add(PosixFilePermission.OWNER_EXECUTE);
+		}
+
+		if (binary.charAt(3) == '1') {
+			perms.add(PosixFilePermission.GROUP_READ);
+		}
+
+		if (binary.charAt(4) == '1') {
+			perms.add(PosixFilePermission.GROUP_WRITE);
+		}
+
+		if (binary.charAt(5) == '1') {
+			perms.add(PosixFilePermission.GROUP_EXECUTE);
+		}
+
+		if (binary.charAt(6) == '1') {
+			perms.add(PosixFilePermission.OTHERS_READ);
+		}
+
+		if (binary.charAt(7) == '1') {
+			perms.add(PosixFilePermission.OTHERS_WRITE);
+		}
+
+		if (binary.charAt(8) == '1') {
+			perms.add(PosixFilePermission.OTHERS_EXECUTE);
+		}
+
+		Files.setPosixFilePermissions(Paths.get(file.getPath()), perms);
 	}
 }
