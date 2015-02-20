@@ -5,7 +5,6 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,7 +26,7 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 	/**
 	 * @parameter default-value="https://s3.amazonaws.com/jruby.org/downloads/1.7.19/jruby-bin-1.7.19.tar.gz" expression="${bundler.jruby_download_location}"
 	 */
-	protected String jruby_download_location;
+	protected String jruby_download_url;
 
 	/**
 	 * @parameter default-value="${project.basedir}/vendor" expression="${bundler.vendor}"
@@ -79,13 +78,13 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 		final File vendorDir = new File(vendor);
 		vendorDir.mkdirs();
 
-		final File jrubyToDownload = new File(jruby_download_location);
+		final File jrubyToDownload = new File(jruby_download_url);
 		final File jrubydownloadedFile = new File(vendorDir, jrubyToDownload.getName());
 
 		if (!jrubydownloadedFile.exists()) {
 
-			System.out.println("Downloading: " + jruby_download_location);
-			final URL jrubyUrl = new URL(jruby_download_location);
+			System.out.println("Downloading: " + jruby_download_url);
+			final URL jrubyUrl = new URL(jruby_download_url);
 
 			final ReadableByteChannel rbc = Channels.newChannel(jrubyUrl.openStream());
 			final FileOutputStream fos = new FileOutputStream(jrubydownloadedFile);
