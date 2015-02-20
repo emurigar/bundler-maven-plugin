@@ -114,7 +114,9 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 		env.put("GEM_HOME", gem_home);
 		env.put("GEM_PATH", gem_home);
 
-		final CommandLine cmd = getCrossPlatformCommandLine(new File(jruby_bin, "gem").getPath());
+		final CommandLine cmd = getCrossPlatformCommandLine(new File(jruby_bin, "jruby").getPath());
+		cmd.addArgument("-S");
+		cmd.addArgument(new File(jruby_bin, "gem").getPath());
 		cmd.addArgument("install");
 		cmd.addArgument("bundler");
 		cmd.addArgument("-v " + bundler_version, false);

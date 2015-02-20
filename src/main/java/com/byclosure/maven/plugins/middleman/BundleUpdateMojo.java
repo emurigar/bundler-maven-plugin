@@ -26,7 +26,9 @@ public class BundleUpdateMojo extends AbstractJRubyMojo {
 		env.put("GEM_HOME", gem_home);
 		env.put("GEM_PATH", gem_path);
 
-		final CommandLine cmd = getCrossPlatformCommandLine(new File(gem_home, "bundle").getPath());
+		final CommandLine cmd = getCrossPlatformCommandLine(jrubyFile.getPath());
+		cmd.addArgument("-S");
+		cmd.addArgument(new File(gem_home, new File("bin", "bundle").getPath()).getPath());
 		cmd.addArgument("update");
 		cmd.addArgument("--binstubs=" + binstubs);
 		cmd.addArgument("--shebang=" + jrubyFile.getPath());
