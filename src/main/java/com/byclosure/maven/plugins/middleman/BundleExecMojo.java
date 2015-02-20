@@ -35,7 +35,9 @@ public class BundleExecMojo extends AbstractJRubyMojo {
 			final String[] splitted = execArgs.split(" ");
 
 			if (splitted.length > 0) {
-				splitted[0] = new File(binstubs, splitted[0]).getPath();
+				if (!isWindows()) {
+					splitted[0] = new File(binstubs, splitted[0]).getPath();
+				}
 
 				cmd.addArguments(splitted);
 			}
