@@ -1,6 +1,7 @@
 ##BUNDLER MAVEN PLUGIN
 
 A plugin for mixed java and ruby application development with jruby and bundler.
+
 It only needs to have java 1.7 and maven installed in the system to be used.
 
 ##How to use
