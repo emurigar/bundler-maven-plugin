@@ -117,8 +117,7 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 		final CommandLine cmd = getCrossPlatformCommandLine(new File(jruby_bin, "gem").getPath());
 		cmd.addArgument("install");
 		cmd.addArgument("bundler");
-		//TODO: see why passing version isn't working
-		//cmd.addArgument("-​-version=" + bundler_version);
+		cmd.addArgument("-v " + bundler_version, false);
 		cmd.addArgument("--no-rdoc");
 		cmd.addArgument("--no-ri");
 
