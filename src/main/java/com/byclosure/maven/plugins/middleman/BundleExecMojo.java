@@ -32,7 +32,13 @@ public class BundleExecMojo extends AbstractJRubyMojo {
 		cmd.addArgument("exec");
 
 		if (execArgs != null) {
-			cmd.addArguments(execArgs.split(" "));
+			final String[] splitted = execArgs.split(" ");
+
+			if (splitted.length > 0) {
+				splitted[0] = new File(binstubs, splitted[0]).getPath();
+
+				cmd.addArguments(splitted);
+			}
 		}
 
 		executeCommandLine(cmd, env, project.getBasedir());
