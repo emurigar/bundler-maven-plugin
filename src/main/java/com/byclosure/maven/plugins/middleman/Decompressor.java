@@ -56,7 +56,9 @@ public class Decompressor {
 				}
 				dest.close();
 
-				applyPermissions(entry.getMode(), file);
+				if (!isWindows()) {
+					applyPermissions(entry.getMode(), file);
+				}
 			}
 		}
 
@@ -113,5 +115,9 @@ public class Decompressor {
 		}
 
 		Files.setPosixFilePermissions(Paths.get(file.getPath()), perms);
+	}
+
+	private static boolean isWindows() {
+		return System.getProperty("os.name").startsWith("Windows");
 	}
 }
