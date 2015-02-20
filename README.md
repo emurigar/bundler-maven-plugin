@@ -1,13 +1,34 @@
-== BUNDLER MAVEN PLUGIN
+##BUNDLER MAVEN PLUGIN
 
 A plugin for mixed java and ruby application development with jruby and bundler.
 
+##How to use
 
-=== Additional Links
+Add the plugin dependency to your pom.xml
 
-* http://jruby.org/[JRuby home] 
-* http://bundler.io/[Bundler gome]
+```xml
+<plugin>
+	<groupId>com.byclosure.maven.plugins</groupId>
+	<artifactId>bundler-maven-plugin</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+</plugin>
+```
 
-=== Contributions
+To install gemfile dependencies (the first time it will download jruby and install bundler to vendor folder)
+```bash
+mvn bundle:install
+````
+
+To invoke and installed gem, for example, invoke middleman
+```bash
+mvn bundle:exec -Dbundler.exec_args="middleman server"
+```
+
+## Additional Links
+
+* http://jruby.org/
+* http://bundler.io/
+
+## Contributions
 
 We welcome all the help we can get!
