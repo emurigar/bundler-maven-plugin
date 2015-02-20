@@ -25,10 +25,9 @@ public class Decompressor {
 			System.out.println("Extracting: " + entry.getName());
 
 			/** If the entry is a directory, create the directory. **/
-
 			if (entry.isDirectory()) {
 
-				File f = new File(destinationDir + entry.getName());
+				File f = new File(destinationDir, entry.getName());
 				f.mkdirs();
 			}
 			/**
@@ -36,11 +35,13 @@ public class Decompressor {
 			 * and close destination stream.
 			 **/
 			else {
+				final File file = new File(destinationDir, entry.getName());
+				file.getParentFile().mkdirs();
+
 				int count;
 				byte data[] = new byte[BUFFER];
 
-				FileOutputStream fos = new FileOutputStream(destinationDir
-						+ entry.getName());
+				FileOutputStream fos = new FileOutputStream(file);
 				BufferedOutputStream dest = new BufferedOutputStream(fos,
 						BUFFER);
 				while ((count = tarIn.read(data, 0, BUFFER)) != -1) {

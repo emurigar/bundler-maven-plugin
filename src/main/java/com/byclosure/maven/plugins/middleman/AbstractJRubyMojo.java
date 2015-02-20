@@ -93,8 +93,7 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 			final FileOutputStream fos = new FileOutputStream(jrubydownloadedFile);
 			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 
-			//TODO: find bugs on decompress
-			//Decompressor.decompress(jrubydownloadedFile.getPath(), vendorDir.getPath() + "/");
+			Decompressor.decompress(jrubydownloadedFile.getPath(), vendorDir.getPath() + "/");
 		}
 	}
 
