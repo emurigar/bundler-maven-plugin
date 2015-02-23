@@ -30,11 +30,6 @@ public class BundleUpdateMojo extends AbstractJRubyMojo {
 		cmd.addArgument("-S");
 		cmd.addArgument(new File(gem_home, new File("bin", "bundle").getPath()).getPath());
 		cmd.addArgument("update");
-		cmd.addArgument("--binstubs=" + binstubs);
-		cmd.addArgument("--shebang=" + jrubyFile.getPath());
-		cmd.addArgument("--gemfile=" + gemfile);
-
-
 
 		executeCommandLine(cmd, env, new File(working_dir));
 	}
