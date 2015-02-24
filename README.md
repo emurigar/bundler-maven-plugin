@@ -12,7 +12,7 @@ Add the plugin dependency to your pom.xml
 <plugin>
 	<groupId>com.byclosure.maven.plugins</groupId>
 	<artifactId>bundler-maven-plugin</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 </plugin>
 ```
 
@@ -70,7 +70,7 @@ mvn bundle:exec -Dbundler.exec_args="middleman server"
       (no description available)
 ```
 
-*bundle:update
+* bundle:update
 ```bash
   Available parameters:
 
