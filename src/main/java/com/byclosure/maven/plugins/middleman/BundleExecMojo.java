@@ -22,9 +22,7 @@ public class BundleExecMojo extends AbstractJRubyMojo {
 	protected void executeComand() throws IOException {
 		final File jrubyFile = new File(jruby_bin, "jruby");
 
-		final Map<String, String> env = new HashMap<String, String>(System.getenv());
-		env.put("GEM_HOME", gem_home);
-		env.put("GEM_PATH", gem_path);
+		final Map<String, String> env = getEnv();
 
 		final CommandLine cmd = getCrossPlatformCommandLine(jrubyFile.getPath());
 		cmd.addArgument("-S");

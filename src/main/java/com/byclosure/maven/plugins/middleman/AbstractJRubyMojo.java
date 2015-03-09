@@ -107,9 +107,7 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 
 	private void installBundler() throws IOException {
 
-		final Map<String, String> env = new HashMap<String, String>(System.getenv());
-		env.put("GEM_HOME", gem_home);
-		env.put("GEM_PATH", gem_home);
+		final Map<String, String> env = getEnv();
 
 		final CommandLine cmd = getCrossPlatformCommandLine(new File(jruby_bin, "jruby").getPath());
 		cmd.addArgument("-S");
@@ -150,6 +148,25 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 		executor.setStreamHandler(pump);
 
 		executor.execute(cmdLine, env);
+	}
+
+	protected Map<String, String> getEnv() {
+		final Map<String, String> env = new HashMap<String, String>(System.getenv());
+		env.put("GEM_HOME", gem_home);
+		env.put("GEM_PATH", gem_home);
+
+		if (env.containsKey("PATH")) {
+			if (!isWindows()) {
+				env.put("PATH", jruby_bin + ":" + env.get("PATH"));
+			} else {
+				env.put("PATH", jruby_bin + ";" + env.get("PATH"));
+			}
+
+		} else {
+			env.put("PATH", jruby_bin);
+		}
+
+		return env;
 	}
 
 }
