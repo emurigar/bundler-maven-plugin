@@ -1,11 +1,5 @@
 package com.byclosure.maven.plugins.middleman;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,40 +10,53 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractJRubyMojo extends AbstractMojo {
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 
+public abstract class AbstractJRubyMojo extends AbstractMojo {
 	/**
-	 * @parameter default-value="${project.basedir}" expression="${bundler.working_dir}"
+	 * @parameter default-value="${project.basedir}"
+	 *            expression="${bundler.working_dir}"
 	 */
 	protected String working_dir;
 
 	/**
-	 * @parameter default-value="https://s3.amazonaws.com/jruby.org/downloads/1.7.19/jruby-bin-1.7.19.tar.gz" expression="${bundler.jruby_download_location}"
+	 * @parameter default-value=
+	 *            "https://s3.amazonaws.com/jruby.org/downloads/1.7.19/jruby-bin-1.7.19.tar.gz"
+	 *            expression="${bundler.jruby_download_location}"
 	 */
 	protected String jruby_download_url;
 
 	/**
-	 * @parameter default-value="${project.basedir}/vendor" expression="${bundler.vendor}"
+	 * @parameter default-value="${project.basedir}/vendor"
+	 *            expression="${bundler.vendor}"
 	 */
 	protected String vendor;
 
 	/**
-	 * @parameter default-value="${project.basedir}/vendor/jruby-1.7.19/bin" expression="${bundler.jruby_home}"
+	 * @parameter default-value="${project.basedir}/vendor/jruby-1.7.19/bin"
+	 *            expression="${bundler.jruby_home}"
 	 */
 	protected String jruby_bin;
 
 	/**
-	 * @parameter default-value="${project.basedir}/vendor/gem_home" expression="${bundler.gem_home}"
+	 * @parameter default-value="${project.basedir}/vendor/gem_home"
+	 *            expression="${bundler.gem_home}"
 	 */
 	protected String gem_home;
 
 	/**
-	 * @parameter default-value="${project.basedir}/vendor/gem_home" expression="${bundler.gem_home}"
+	 * @parameter default-value="${project.basedir}/vendor/gem_home"
+	 *            expression="${bundler.gem_home}"
 	 */
 	protected String gem_path;
 
 	/**
-	 * @parameter default-value="${project.basedir}/vendor/bin" expression="${bundler.binstubs}"
+	 * @parameter default-value="${project.basedir}/vendor/bin"
+	 *            expression="${bundler.binstubs}"
 	 */
 	protected String binstubs;
 
@@ -73,43 +80,42 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 		}
 	}
 
-
-	protected void extractJRubyToVendor() throws IOException, URISyntaxException, MojoExecutionException {
+	protected void extractJRubyToVendor() throws IOException,
+			URISyntaxException, MojoExecutionException {
 		final File vendorDir = new File(vendor);
 		vendorDir.mkdirs();
-
 		final File jrubyToDownload = new File(jruby_download_url);
-		final File jrubydownloadedFile = new File(vendorDir, jrubyToDownload.getName());
-
+		final File jrubydownloadedFile = new File(vendorDir,
+				jrubyToDownload.getName());
 		if (!jrubydownloadedFile.exists()) {
-
 			System.out.println("Downloading: " + jruby_download_url);
 			final URL jrubyUrl = new URL(jruby_download_url);
 
-			final ReadableByteChannel rbc = Channels.newChannel(jrubyUrl.openStream());
-			final FileOutputStream fos = new FileOutputStream(jrubydownloadedFile);
+			final ReadableByteChannel rbc = Channels.newChannel(jrubyUrl
+					.openStream());
+			final FileOutputStream fos = new FileOutputStream(
+					jrubydownloadedFile);
 			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-
-			Decompressor.decompress(jrubydownloadedFile.getPath(), vendorDir.getPath() + "/");
+			Decompressor.decompress(jrubydownloadedFile.getPath(),
+					vendorDir.getPath() + "/");
+			fos.close();
 		}
 	}
 
 	protected void ensureBundlerInstalled() throws IOException {
 		final File gemHomeDir = new File(gem_home);
 		gemHomeDir.mkdirs();
-
-		final File bundleFile = new File(gem_home, new File("bin", "bundle").getPath());
-
+		final File bundleFile = new File(gem_home,
+				new File("bin", "bundle").getPath());
 		if (!bundleFile.exists()) {
 			installBundler();
 		}
 	}
 
 	private void installBundler() throws IOException {
-
 		final Map<String, String> env = getEnv();
-
-		final CommandLine cmd = getCrossPlatformCommandLine(new File(jruby_bin, "jruby").getPath());
+		final CommandLine cmd = getCrossPlatformCommandLine(new File(jruby_bin,
+				"jruby").getPath());
 		cmd.addArgument("-S");
 		cmd.addArgument(new File(jruby_bin, "gem").getPath());
 		cmd.addArgument("install");
@@ -117,10 +123,8 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 		cmd.addArgument("-v " + bundler_version, false);
 		cmd.addArgument("--no-rdoc");
 		cmd.addArgument("--no-ri");
-
 		executeCommandLine(cmd, env, new File(working_dir));
 	}
-
 
 	protected boolean isWindows() {
 		return System.getProperty("os.name").startsWith("Windows");
@@ -128,7 +132,6 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 
 	protected CommandLine getCrossPlatformCommandLine(String executable) {
 		final CommandLine cmdLine;
-
 		if (isWindows()) {
 			cmdLine = new CommandLine("cmd");
 			cmdLine.addArgument("/c");
@@ -136,37 +139,36 @@ public abstract class AbstractJRubyMojo extends AbstractMojo {
 		} else {
 			cmdLine = new CommandLine(executable);
 		}
-
 		return cmdLine;
 	}
 
-	protected void executeCommandLine(CommandLine cmdLine, Map<String, String> env, File workingDir) throws IOException {
-		DefaultExecutor executor = new DefaultExecutor();
+	protected void executeCommandLine(CommandLine cmdLine,
+			Map<String, String> env, File workingDir) throws IOException {
+		final DefaultExecutor executor = new DefaultExecutor();
 		executor.setWorkingDirectory(workingDir);
-
-		PumpStreamHandler pump = new PumpStreamHandler(System.out, System.err, System.in);
+		final PumpStreamHandler pump = new PumpStreamHandler(System.out,
+				System.err, System.in);
 		executor.setStreamHandler(pump);
-
 		executor.execute(cmdLine, env);
 	}
 
 	protected Map<String, String> getEnv() {
-		final Map<String, String> env = new HashMap<String, String>(System.getenv());
+		final Map<String, String> env = new HashMap<String, String>(
+				System.getenv());
+		for (String propertyName : System.getProperties().stringPropertyNames()) {
+			env.put(propertyName, System.getProperty(propertyName));
+		}
 		env.put("GEM_HOME", gem_home);
 		env.put("GEM_PATH", gem_home);
-
 		if (env.containsKey("PATH")) {
 			if (!isWindows()) {
 				env.put("PATH", jruby_bin + ":" + env.get("PATH"));
 			} else {
 				env.put("PATH", jruby_bin + ";" + env.get("PATH"));
 			}
-
 		} else {
 			env.put("PATH", jruby_bin);
 		}
-
 		return env;
 	}
-
 }

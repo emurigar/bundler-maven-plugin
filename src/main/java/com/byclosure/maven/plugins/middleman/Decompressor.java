@@ -1,22 +1,26 @@
 package com.byclosure.maven.plugins.middleman;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.io.IOUtils;
-
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+
 public class Decompressor {
 	final static int BUFFER = 2048;
 
-	public static void decompress(String sourceFile, String destinationDir) throws IOException {
+	public static void decompress(String sourceFile, String destinationDir)
+			throws IOException {
 		/** create a TarArchiveInputStream object. **/
 		FileInputStream fin = new FileInputStream(sourceFile);
 		BufferedInputStream in = new BufferedInputStream(fin);
@@ -68,15 +72,19 @@ public class Decompressor {
 		System.out.println("untar completed successfully!!");
 	}
 
-	private static void applyPermissions(int mode, File file) throws IOException {
+	private static void applyPermissions(int mode, File file)
+			throws IOException {
 		final Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
 
 		String octal = Integer.toOctalString(mode);
-		octal = octal.substring(octal.length() -3);
+		octal = octal.substring(octal.length() - 3);
 
-		String binary = Integer.toBinaryString(Integer.parseInt(octal.substring(0, 1)));
-		binary += Integer.toBinaryString(Integer.parseInt(octal.substring(1, 2)));
-		binary += Integer.toBinaryString(Integer.parseInt(octal.substring(2, 3)));
+		String binary = Integer.toBinaryString(Integer.parseInt(octal
+				.substring(0, 1)));
+		binary += Integer
+				.toBinaryString(Integer.parseInt(octal.substring(1, 2)));
+		binary += Integer
+				.toBinaryString(Integer.parseInt(octal.substring(2, 3)));
 
 		if (binary.charAt(0) == '1') {
 			perms.add(PosixFilePermission.OWNER_READ);
