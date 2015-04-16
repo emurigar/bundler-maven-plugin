@@ -2,3 +2,8 @@ bundler-maven-plugin.iml
 bundler-maven-plugin.ipr
 bundler-maven-plugin.iws
 target/
+
+.classpath
+.settings/
+.factorypath
+.project
