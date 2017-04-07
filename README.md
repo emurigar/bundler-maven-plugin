@@ -13,6 +13,9 @@ Add the plugin dependency to your pom.xml
 	<groupId>com.byclosure.maven.plugins</groupId>
 	<artifactId>bundler-maven-plugin</artifactId>
 	<version>0.0.1</version>
+	<configuration>
+		<working_dir>[Path to the folder with the Gemfile]</working_dir>
+	</configuration>
 </plugin>
 ```
 
